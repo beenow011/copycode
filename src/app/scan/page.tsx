@@ -1,8 +1,12 @@
 import React from 'react'
+import ScantoRes from '../component/ScantoRes'
 
 function Page() {
     return (
-        <div>Page</div>
+        <div>
+
+            <ScantoRes />
+        </div>
     )
 }
 
