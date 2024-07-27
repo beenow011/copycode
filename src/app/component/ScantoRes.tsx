@@ -46,7 +46,11 @@ function ScantoRes() {
     const startCamera = async () => {
         try {
             setIsCameraOn(true);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment' // Use the back camera
+                }
+            });
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
 
