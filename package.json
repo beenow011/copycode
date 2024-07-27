@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.16.0",
+    "@radix-ui/react-navigation-menu": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
     "ai": "^3.2.36",
     "class-variance-authority": "^0.7.0",

@@ -58,7 +58,7 @@ function Question() {
 
     return (
         <div className='text-white flex flex-col justify-center items-center'>
-            <div className='text-3xl font-mono font-semibold mb-12 text-purple-500'>
+            <div className='text-xl md:text-3xl font-mono font-semibold mb-6 md:mb-12 text-purple-500'>
                 Obtain answers for your multiple-choice questions using various AI endpoints.
             </div>
             <Textarea value={q} onChange={e => setQ(e.target.value)} className='text-black px-7 w-full md:w-96 h-96 mb-8' placeholder='question' />
