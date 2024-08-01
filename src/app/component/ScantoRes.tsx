@@ -1,13 +1,14 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Ellipsis, LoaderPinwheel } from 'lucide-react';
+import { Ellipsis, Loader2, LoaderPinwheel } from 'lucide-react';
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
-import ReactCrop, { type Crop, PixelCrop } from 'react-image-crop';
-import Tesseract from 'tesseract.js';
+import Cropper, { Area, Point } from 'react-easy-crop';
+import Tesseract, { createWorker } from 'tesseract.js';
 
 function ScantoRes() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [recognizedText, setRecognizedText] = useState('');
+    const [textLoad, setTextLoad] = useState(false);
     const [res, setRes] = useState('');
     const [res2, setRes2] = useState('');
     const [isCameraOn, setIsCameraOn] = useState(false);
@@ -15,8 +16,10 @@ function ScantoRes() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [load1, setLoad1] = useState(false);
     const [load2, setLoad2] = useState(false);
-    const [crop, setCrop] = useState<Crop | null>(null);
-    const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [cropArea, setCropArea] = useState<Area | null>(null);
+    const [cropAreaPixel, setCropAreaPixel] = useState<Area | null>(null);
 
     const run = () => {
         setLoad1(true);
@@ -81,39 +84,11 @@ function ScantoRes() {
         }
     };
 
-    useEffect(() => {
-        const recognizeText = async () => {
-            if (completedCrop && selectedImage) {
-                const image = new Image();
-                image.src = selectedImage;
-                const canvas = document.createElement('canvas');
-                const scaleX = image.naturalWidth / image.width;
-                const scaleY = image.naturalHeight / image.height;
-                canvas.width = completedCrop.width;
-                canvas.height = completedCrop.height;
-                const ctx = canvas.getContext('2d');
-
-                if (ctx) {
-                    ctx.drawImage(
-                        image,
-                        completedCrop.x * scaleX,
-                        completedCrop.y * scaleY,
-                        completedCrop.width * scaleX,
-                        completedCrop.height * scaleY,
-                        0,
-                        0,
-                        completedCrop.width,
-                        completedCrop.height
-                    );
-                    const base64Image = canvas.toDataURL('image/jpeg');
-                    setRecognizedText('');
-                    const result = await Tesseract.recognize(base64Image, 'eng');
-                    setRecognizedText(result.data.text);
-                }
-            }
-        };
-        recognizeText();
-    }, [completedCrop, selectedImage]);
+    const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
+        console.log(croppedArea, croppedAreaPixels, "done");
+        setCropArea(croppedArea);
+        setCropAreaPixel(croppedAreaPixels);
+    };
 
     const startCamera = async () => {
         try {
@@ -140,24 +115,68 @@ function ScantoRes() {
         }
     };
 
-    const convertCropToPixels = (crop: Crop, imageWidth: number, imageHeight: number): PixelCrop => {
-        return {
-            x: crop.unit === '%' ? (crop.x / 100) * imageWidth : crop.x,
-            y: crop.unit === '%' ? (crop.y / 100) * imageHeight : crop.y,
-            width: crop.unit === '%' ? (crop.width / 100) * imageWidth : crop.width,
-            height: crop.unit === '%' ? (crop.height / 100) * imageHeight : crop.height,
-            unit: 'px' // Ensure the unit is set to 'px'
-        };
-    };
-
-    const handleCrop = () => {
-        if (crop && selectedImage) {
+    const recognizeText = () => {
+        console.log(2);
+        if (selectedImage && cropAreaPixel) {
+            setTextLoad(true);
             const image = new Image();
             image.src = selectedImage;
-            image.onload = () => {
-                const pixelCrop = convertCropToPixels(crop, image.naturalWidth, image.naturalHeight);
-                setCompletedCrop(pixelCrop);
+            image.onload = async () => {
+                const canvas = document.createElement('canvas');
+                const scaleX = image.naturalWidth / image.width;
+                const scaleY = image.naturalHeight / image.height;
+                canvas.width = cropAreaPixel.width;
+                canvas.height = cropAreaPixel.height;
+                const ctx = canvas.getContext('2d');
+
+                if (ctx) {
+                    console.log(4)
+                    ctx.drawImage(
+                        image,
+                        cropAreaPixel.x * scaleX,
+                        cropAreaPixel.y * scaleY,
+                        cropAreaPixel.width * scaleX,
+                        cropAreaPixel.height * scaleY,
+                        0,
+                        0,
+                        cropAreaPixel.width,
+                        cropAreaPixel.height
+                    );
+                    console.log(5)
+
+                    const base64Image = canvas.toDataURL('image/jpeg');
+                    // setSelectedImage(URL.createObjectURL(image));
+                    console.log(6)
+
+                    setRecognizedText('');
+                    // console.log('Base64 Image:', base64Image);
+                    console.log(7)
+
+                    createWorker('eng')
+                        .then(worker => {
+                            console.log(8);
+                            return worker.recognize(base64Image)
+                                .then(result => {
+                                    console.log(9)
+                                    setRecognizedText(result.data.text);
+                                    console.log('Recognized Text:', result.data.text);
+                                    return worker.terminate();
+                                });
+                        })
+                        .catch(err => {
+                            console.error('Error recognizing text:', err);
+                        })
+                        .finally(() => {
+                            setTextLoad(false);
+                        });
+                }
             };
+            image.onerror = (err) => {
+                setTextLoad(false);
+                console.log(err)
+            };
+        } else {
+            setTextLoad(false);
         }
     };
 
@@ -181,15 +200,27 @@ function ScantoRes() {
                 <canvas ref={canvasRef} style={{ display: 'none' }} />
             </div>
             {selectedImage && (
-                <div>
-                    <ReactCrop crop={crop!} onChange={c => setCrop(c)}>
-                        <img src={selectedImage} alt="Selected" />
-                    </ReactCrop>
-                    <Button onClick={handleCrop}>Crop</Button>
+                <div className='mt-4'>
+                    <div className='cropper-container'>
+                        <Cropper
+                            image={selectedImage}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={4 / 3}
+                            onCropChange={setCrop}
+                            onCropComplete={onCropComplete}
+                            onZoomChange={setZoom}
+                        />
+                    </div>
+                    <Button onClick={recognizeText}>Scan text</Button>
                 </div>
             )}
             <h2>Recognized Text:</h2>
-            <p>{recognizedText}</p>
+
+
+            {textLoad ? (<>
+                <Loader2 className='h-6 w-6 animate-spin text-purple-600' />
+            </>) : (<p>{recognizedText}</p>)}
             <Button onClick={run} className='my-6' disabled={recognizedText.length === 0}>Search</Button>
             <div className='flex flex-col md:flex-row gap-4'>
                 <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>

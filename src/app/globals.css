@@ -68,3 +68,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.cropper-container {
+  position: relative;
+  width: 400px; /* or any desired width */
+  height: 300px; 
+  margin: auto; /* Center the cropper horizontally */
+  border: 1px solid #ccc; /* Optional: add a border */
+  background-color: #f0f0f0; /* Optional: add a background color */
+}
