@@ -166,7 +166,7 @@ function CodeSearch() {
             {
                 load1 ? (
                     <div className='w-full flex mt-7 justify-center items-center'>
-                        <LoaderPinwheel className='h-8 w-8 text-purple-600' />
+                        <LoaderPinwheel className='h-8 w-8 text-purple-600 animate-spin' />
                     </div>
                 ) : code && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-md border border-gray-200">
@@ -175,7 +175,7 @@ function CodeSearch() {
                             <code>{code.substring(3, code.length - 3)}</code>
                         </pre>
                         <button
-                            onClick={() => navigator.clipboard.writeText(code)}
+                            onClick={copyCode}
                             className="mt-3 bg-purple-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                             Copy Code
