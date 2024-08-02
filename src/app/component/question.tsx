@@ -52,7 +52,14 @@ function Question() {
     };
 
 
-
+    const handlePaste = async () => {
+        try {
+            const text = await navigator.clipboard.readText(); // Read text from the clipboard
+            setQ(text); // Update state with the pasted text
+        } catch (err) {
+            console.error('Failed to read clipboard contents: ', err);
+        }
+    };
 
 
 
@@ -63,8 +70,11 @@ function Question() {
             </div>
             <Textarea value={q} onChange={e => setQ(e.target.value)} className='text-black px-7 w-full md:w-96 h-96 mb-8' placeholder='question' />
 
-            <Button onClick={run} className='mb-6'>Search</Button>
-
+            <div className='flex gap-2'>
+                <Button onClick={run} className='mb-6'>Search</Button>
+                <Button onClick={() => setQ('')} className='mb-6'>Clear</Button>
+                <Button onClick={handlePaste} className='mb-6'>Paste</Button>
+            </div>
             <div className='flex flex-col md:flex-row gap-4'>
                 <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>
                     <div className='flex gap-2'>

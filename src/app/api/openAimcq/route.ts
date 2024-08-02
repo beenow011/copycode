@@ -23,7 +23,7 @@ export const POST = async(req: NextRequest , res:NextApiResponse)=>{
             return NextResponse.json({result:"No question"},{status:200})
         }
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // Correct model name use gpt-4-turbo-2024-04-09 in production
+            model: 'gpt-4o-mini', // Correct model name use gpt-4-turbo-2024-04-09 in production
             temperature: 0.1, // Adjust the temperature as needed
             stream: false,
             messages: [
