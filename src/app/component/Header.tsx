@@ -3,60 +3,31 @@
 import * as React from "react"
 import Link from "next/link"
 
-import { cn } from "@/lib/utils"
-// import { Icons } from "@/components/icons"
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-
-const components: { title: string; href: string; description: string }[] = [
-    {
-        title: "Alert Dialog",
-        href: "/docs/primitives/alert-dialog",
-        description:
-            "A modal dialog that interrupts the user with important content and expects a response.",
-    },
-    {
-        title: "Hover Card",
-        href: "/docs/primitives/hover-card",
-        description:
-            "For sighted users to preview content available behind a link.",
-    },
-    {
-        title: "Progress",
-        href: "/docs/primitives/progress",
-        description:
-            "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-    },
-    {
-        title: "Scroll-area",
-        href: "/docs/primitives/scroll-area",
-        description: "Visually or semantically separates content.",
-    },
-    {
-        title: "Tabs",
-        href: "/docs/primitives/tabs",
-        description:
-            "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-    },
-    {
-        title: "Tooltip",
-        href: "/docs/primitives/tooltip",
-        description:
-            "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
-    },
-]
 
 export function NavigationMenuDemo() {
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     return (
-        <div className="bg-purple-600 text-white rounded-lg shadow-lg mb-9">
-            <ul className="flex gap-4 justify-center p-4">
+        <div className="bg-purple-600 text-white md:flex justify-between rounded-lg shadow-lg mb-9">
+            <div className="p-4 flex items-center justify-between">
+                <h1 className="text-2xl font-bold">SolveSphere AI</h1>
+                <button
+                    className="text-white lg:hidden flex items-center"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+            <ul
+                className={`lg:flex lg:gap-4 lg:justify-center lg:p-4 lg:mt-0 mt-4 ${isMenuOpen ? 'block' : 'hidden'}`}
+            >
                 <li className="relative group">
                     <Link href={'/'} className="block py-3 px-6 text-lg font-semibold rounded-md hover:bg-purple-700 transition-colors duration-300">
                         MCQ
@@ -78,5 +49,6 @@ export function NavigationMenuDemo() {
             </ul>
         </div>
     );
+
 
 }

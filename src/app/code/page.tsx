@@ -1,8 +1,9 @@
 import React from 'react'
+import CodeSearch from '../component/CodeSearch'
 
 function Page() {
     return (
-        <div>P</div>
+        <CodeSearch />
     )
 }
 
