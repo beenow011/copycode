@@ -6,7 +6,7 @@ import { NavigationMenuDemo } from "./component/Header";
 export default function Home() {
   // const [question, setQuestion] = useState('')
   return (
-    <main className="flex min-h-screen flex-col items-center px-12  bg-black">
+    <main className="flex min-h-screen flex-col items-center px-12 bg-gray-800">
       {/* <input type="text"/> */}
 
       <Question />

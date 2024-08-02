@@ -4,6 +4,7 @@ import { Ellipsis, Loader2, LoaderPinwheel } from 'lucide-react';
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import Cropper, { Area, Point } from 'react-easy-crop';
 import Tesseract, { createWorker } from 'tesseract.js';
+import OutputRes from './OutputRes';
 
 function ScantoRes() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -192,90 +193,68 @@ function ScantoRes() {
 
 
     return (
-        <div className='text-purple-800 px-6 md:px-12 py-8 flex flex-col items-center space-y-6'>
-            <p className='text-2xl md:text-4xl font-bold mb-4 text-center text-purple-700'>
-                Scan the image and get your answers
-            </p>
+        <div className=' min-h-screen'>
+            <div className='text-purple-800 px-6 md:px-12 py-8 flex flex-col items-center space-y-6'>
+                <p className='text-2xl md:text-4xl font-bold mb-4 text-center text-purple-700'>
+                    Scan the image and get your answers
+                </p>
 
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className='bg-gray-200 text-gray-800 p-3 rounded-lg shadow-md transition-transform duration-300 hover:scale-105'
-            />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className='bg-gray-200 text-gray-800 p-3 rounded-lg shadow-md transition-transform duration-300 hover:scale-105'
+                />
 
-            {selectedImage && (
-                <div className='mt-6 space-y-4'>
-                    <div className='relative w-full md:w-[600px] h-[400px]'>
-                        <Cropper
-                            image={selectedImage}
-                            crop={crop}
-                            zoom={zoom}
-                            aspect={4 / 3}
-                            onCropChange={setCrop}
-                            onCropComplete={onCropComplete}
-                            onZoomChange={setZoom}
+                {selectedImage && (
+                    <div className='mt-6 space-y-4'>
+                        <div className='relative w-full md:w-[600px] h-[400px] rounded-lg border-2 border-purple-300 shadow-md'>
+                            <Cropper
+                                image={selectedImage}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={4 / 3}
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
 
-                        />
-                    </div>
-                    <Button
-                        className='mt-4 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
-                        onClick={recognizeText}
-                    >
-                        Scan Text
-                    </Button>
-                </div>
-            )}
-
-            <div className='w-full md:w-[600px] space-y-4'>
-                <h2 className='text-xl font-semibold text-purple-700'>Recognized Text:</h2>
-
-                {textLoad ? (
-                    <div className='flex justify-center items-center'>
-                        <Loader2 className='h-8 w-8 animate-spin text-purple-600' />
-                    </div>
-                ) : (binaryImage.length > 0 && recognizedText.length > 0) && (
-                    <div className='flex flex-col items-center space-y-4'>
-                        <img src={binaryImage} alt="Binarized" className='w-72 h-auto rounded-lg shadow-md border border-purple-300' />
-                        <p className='w-full md:w-96 bg-gray-100 p-4 rounded-lg shadow-md border-2 border-purple-400 text-center text-gray-800'>
-                            {recognizedText}
-                        </p>
+                            />
+                        </div>
+                        <Button
+                            className='mt-4 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
+                            onClick={recognizeText}
+                        >
+                            Scan Text
+                        </Button>
                     </div>
                 )}
 
-                <Button
-                    onClick={run}
-                    className='mt-6 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
-                    disabled={recognizedText.length === 0}
-                >
-                    Search
-                </Button>
-            </div>
+                <div className='w-full md:w-[600px] space-y-4'>
+                    <h2 className='text-xl font-semibold text-purple-700'>Recognized Text:</h2>
 
-            <div className='flex flex-col md:flex-row gap-6'>
-                <div className='w-full md:w-[300px] bg-gray-800 text-white rounded-lg p-4 shadow-md'>
-                    <div className='flex items-center gap-2 mb-2'>
-                        <p className='text-lg font-semibold text-purple-300'>Gemini</p>
-                        <LoaderPinwheel className={`h-6 w-6 ${load1 && 'animate-spin'} text-purple-300`} />
-                    </div>
-                    {load1 ? (
-                        <Ellipsis className='h-6 w-6 text-purple-300' />
-                    ) : (
-                        <p>{res}</p>
+                    {textLoad ? (
+                        <div className='flex justify-center items-center'>
+                            <Loader2 className='h-8 w-8 animate-spin text-purple-600' />
+                        </div>
+                    ) : (binaryImage.length > 0 && recognizedText.length > 0) && (
+                        <div className='flex flex-col items-center space-y-4'>
+                            <img src={binaryImage} alt="Binarized" className='w-72 h-auto rounded-lg shadow-md border border-purple-300' />
+                            <p className='w-full md:w-96 bg-gray-100 p-4 rounded-lg shadow-md border-2 border-purple-400 text-center text-gray-800'>
+                                {recognizedText}
+                            </p>
+                        </div>
                     )}
+
+                    <Button
+                        onClick={run}
+                        className='mt-6 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
+                        disabled={recognizedText.length === 0}
+                    >
+                        Search
+                    </Button>
                 </div>
 
-                <div className='w-full md:w-[300px] bg-gray-800 text-white rounded-lg p-4 shadow-md'>
-                    <div className='flex items-center gap-2 mb-2'>
-                        <p className='text-lg font-semibold text-purple-300'>OpenAI</p>
-                        <LoaderPinwheel className={`h-6 w-6 ${load2 && 'animate-spin'} text-purple-300`} />
-                    </div>
-                    {load2 ? (
-                        <Ellipsis className='h-6 w-6 text-purple-300' />
-                    ) : (
-                        <p>{res2}</p>
-                    )}
-                </div>
+                <OutputRes load1={load1} load2={load2} res={res} res2={res2} />
             </div>
         </div>
     );
