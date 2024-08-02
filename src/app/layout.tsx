@@ -19,6 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {
+          process.env.NODE_ENV === "production" && (
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3653533988594535"
+              crossOrigin="anonymous"></script>
+          )
+        }
+      </head>
       <body className={`bg-gray-800`}>
         <NavigationMenuDemo />
         {children}
