@@ -64,49 +64,69 @@ function Question() {
 
 
     return (
-        <div className='text-white flex flex-col justify-center items-center'>
-            <div className='text-xl md:text-3xl font-mono font-semibold mb-6 md:mb-12 text-purple-500'>
+        <div className='flex flex-col items-center justify-center bg-gray-800 text-white min-h-screen p-8'>
+            <div className='text-2xl md:text-4xl font-bold mb-8 md:mb-12 text-purple-400 text-center'>
                 Obtain answers for your multiple-choice questions using various AI endpoints.
             </div>
-            <Textarea value={q} onChange={e => setQ(e.target.value)} className='text-black px-7 w-full md:w-96 h-96 mb-8' placeholder='question' />
 
-            <div className='flex gap-2'>
-                <Button onClick={run} className='mb-6'>Search</Button>
-                <Button onClick={() => setQ('')} className='mb-6'>Clear</Button>
-                <Button onClick={handlePaste} className='mb-6'>Paste</Button>
+            <Textarea
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                className='text-black px-4 py-3 w-full md:w-96 h-60 md:h-80 mb-6 bg-white rounded-lg shadow-lg border border-gray-200 focus:border-purple-500 focus:ring focus:ring-purple-200 transition duration-300 ease-in-out'
+                placeholder='Enter your question here'
+            />
+
+
+            <div className='flex gap-4 mb-6'>
+                <Button
+                    onClick={run}
+                    className='bg-red-600 text-white hover:bg-red-700 transition-colors duration-300 py-2 px-4 rounded-lg shadow-md'
+                    disabled={q.length === 0}
+                >
+                    Search
+                </Button>
+                <Button
+                    onClick={() => setQ('')}
+                    className='bg-gray-600 text-white hover:bg-gray-700 transition-colors duration-300 py-2 px-4 rounded-lg shadow-md'
+                >
+                    Clear
+                </Button>
+                <Button
+                    onClick={handlePaste}
+                    className='bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300 py-2 px-4 rounded-lg shadow-md'
+                >
+                    Paste
+                </Button>
             </div>
-            <div className='flex flex-col md:flex-row gap-4'>
-                <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>
-                    <div className='flex gap-2'>
-                        <p className='text-purple-500 font-bold text-xl'>Gemini</p>
-                        <LoaderPinwheel className={` h-6 w-6 ${load1 && 'animate-spin'} text-purple-500`} />
-                    </div>
-                    {
-                        load1 ? <Ellipsis className=' h-5 w-6 text-purple-500' /> : (
-                            res && <div>
 
-                                <p>{res}</p></div>
-                        )
-                    }
-                </div>
-                <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>
-                    <div className='flex gap-2'>
-                        <p className='text-purple-500 font-bold text-xl'>OpenAI</p>
-                        <LoaderPinwheel className={` h-6 w-6 ${load2 && 'animate-spin'} text-purple-500`} />
+            <div className='flex flex-col md:flex-row gap-6 w-full md:w-2/3'>
+                <div className='w-full md:w-1/2 bg-gray-700 rounded-lg p-4 shadow-md'>
+                    <div className='flex items-center gap-2 mb-2'>
+                        <p className='text-purple-300 font-semibold text-lg'>Gemini</p>
+                        <LoaderPinwheel className={`h-6 w-6 ${load1 ? 'animate-spin' : ''} text-purple-300`} />
                     </div>
-                    {
-                        load2 ? <Ellipsis className=' h-5 w-6 text-purple-500' /> : (
-                            res2 && <div>
-
-                                <p>{res2}</p></div>
-                        )
-                    }
+                    {load1 ? (
+                        <Ellipsis className='h-6 w-6 text-purple-300' />
+                    ) : (
+                        res && <p className='text-white'>{res}</p>
+                    )}
                 </div>
 
-
+                <div className='w-full md:w-1/2 bg-gray-700 rounded-lg p-4 shadow-md'>
+                    <div className='flex items-center gap-2 mb-2'>
+                        <p className='text-purple-300 font-semibold text-lg'>OpenAI</p>
+                        <LoaderPinwheel className={`h-6 w-6 ${load2 ? 'animate-spin' : ''} text-purple-300`} />
+                    </div>
+                    {load2 ? (
+                        <Ellipsis className='h-6 w-6 text-purple-300' />
+                    ) : (
+                        res2 && <p className='text-white'>{res2}</p>
+                    )}
+                </div>
             </div>
         </div>
-    )
+    );
+
 }
 
 export default Question

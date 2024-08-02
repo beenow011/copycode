@@ -20,6 +20,7 @@ function ScantoRes() {
     const [zoom, setZoom] = useState(1);
     const [cropArea, setCropArea] = useState<Area | null>(null);
     const [cropAreaPixel, setCropAreaPixel] = useState<Area | null>(null);
+    const [binaryImage, setBinaryImage] = useState('')
 
     const run = () => {
         setLoad1(true);
@@ -68,21 +69,6 @@ function ScantoRes() {
         }
     };
 
-    const handleCapture = () => {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (video && canvas) {
-            const context = canvas.getContext('2d');
-            if (context) {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(blob => {
-                    if (blob) {
-                        setSelectedImage(URL.createObjectURL(blob));
-                    }
-                });
-            }
-        }
-    };
 
     const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
         console.log(croppedArea, croppedAreaPixels, "done");
@@ -90,29 +76,44 @@ function ScantoRes() {
         setCropAreaPixel(croppedAreaPixels);
     };
 
-    const startCamera = async () => {
-        try {
-            setIsCameraOn(true);
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'environment',
-                },
-            });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-            }
-        } catch (error) {
-            console.error('Error accessing camera:', error);
-        }
-    };
 
-    const stopCamera = () => {
-        const stream = videoRef.current?.srcObject as MediaStream;
-        if (stream) {
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-            setIsCameraOn(false);
-        }
+
+
+    const binarizeImage = (base64Image: string, callback: (binarizedBase64: string | null) => void) => {
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        const image = new Image();
+        image.src = base64Image;
+
+        image.onload = () => {
+            if (canvas && ctx) {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0, 0, image.width, image.height);
+
+                const imageData = ctx.getImageData(0, 0, image.width, image.height);
+                const data = imageData.data;
+                const threshold = 128; // You can adjust the threshold value
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    const value = avg >= threshold ? 255 : 0;
+                    data[i] = value;
+                    data[i + 1] = value;
+                    data[i + 2] = value;
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                const binarizedBase64 = canvas.toDataURL();
+                setBinaryImage(binarizedBase64)
+                callback(binarizedBase64);
+            }
+        };
+
+        image.onerror = (err) => {
+            console.error('Error loading image:', err);
+            callback(null);
+        };
     };
 
     const recognizeText = () => {
@@ -121,7 +122,8 @@ function ScantoRes() {
             setTextLoad(true);
             const image = new Image();
             image.src = selectedImage;
-            image.onload = async () => {
+
+            image.onload = () => {
                 const canvas = document.createElement('canvas');
                 const scaleX = image.naturalWidth / image.width;
                 const scaleY = image.naturalHeight / image.height;
@@ -130,7 +132,7 @@ function ScantoRes() {
                 const ctx = canvas.getContext('2d');
 
                 if (ctx) {
-                    console.log(4)
+                    console.log(4);
                     ctx.drawImage(
                         image,
                         cropAreaPixel.x * scaleX,
@@ -142,38 +144,46 @@ function ScantoRes() {
                         cropAreaPixel.width,
                         cropAreaPixel.height
                     );
-                    console.log(5)
+                    console.log(5);
 
                     const base64Image = canvas.toDataURL('image/jpeg');
-                    // setSelectedImage(URL.createObjectURL(image));
-                    console.log(6)
+                    console.log(6);
 
                     setRecognizedText('');
-                    // console.log('Base64 Image:', base64Image);
-                    console.log(7)
+                    console.log(7);
 
-                    createWorker('eng')
-                        .then(worker => {
-                            console.log(8);
-                            return worker.recognize(base64Image)
-                                .then(result => {
-                                    console.log(9)
-                                    setRecognizedText(result.data.text);
-                                    console.log('Recognized Text:', result.data.text);
-                                    return worker.terminate();
+                    binarizeImage(base64Image, (binarizedBase64) => {
+                        if (binarizedBase64) {
+                            createWorker('eng')
+                                .then(worker => {
+                                    worker.setParameters({
+                                        tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+                                    });
+                                    console.log(8);
+                                    return worker.recognize(binarizedBase64)
+                                        .then(result => {
+                                            console.log(9);
+                                            setRecognizedText(result.data.text);
+                                            console.log('Recognized Text:', result.data.text);
+                                            return worker.terminate();
+                                        });
+                                })
+                                .catch(err => {
+                                    console.error('Error recognizing text:', err);
+                                })
+                                .finally(() => {
+                                    setTextLoad(false);
                                 });
-                        })
-                        .catch(err => {
-                            console.error('Error recognizing text:', err);
-                        })
-                        .finally(() => {
+                        } else {
                             setTextLoad(false);
-                        });
+                        }
+                    });
                 }
             };
+
             image.onerror = (err) => {
                 setTextLoad(false);
-                console.log(err)
+                console.error('Error loading image:', err);
             };
         } else {
             setTextLoad(false);
@@ -182,26 +192,21 @@ function ScantoRes() {
 
 
     return (
-        <div className='text-purple-500 px-12 flex flex-col items-center'>
-            <p className='text-xl md:text-3xl font-mono font-semibold mb-6 md:mb-12 text-purple-500'>Scan the image and get your answers</p>
-            <input type="file" accept="image/*" onChange={handleImageUpload} className='bg-slate-500 p-3 rounded-md mb-2' />
-            <div>
-                {isCameraOn ? (
-                    <div className=''>
-                        <div className='w-full flex justify-center items-center gap-2 mb-3'>
-                            <Button onClick={handleCapture}>Capture Photo</Button>
-                            <Button onClick={stopCamera}>Stop Camera</Button>
-                        </div>
-                        <video ref={videoRef} autoPlay height={200} width={300} />
-                    </div>
-                ) : (
-                    <Button onClick={startCamera}>Start Camera</Button>
-                )}
-                <canvas ref={canvasRef} style={{ display: 'none' }} />
-            </div>
+        <div className='text-purple-800 px-6 md:px-12 py-8 flex flex-col items-center space-y-6'>
+            <p className='text-2xl md:text-4xl font-bold mb-4 text-center text-purple-700'>
+                Scan the image and get your answers
+            </p>
+
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className='bg-gray-200 text-gray-800 p-3 rounded-lg shadow-md transition-transform duration-300 hover:scale-105'
+            />
+
             {selectedImage && (
-                <div className='mt-4'>
-                    <div className='cropper-container'>
+                <div className='mt-6 space-y-4'>
+                    <div className='relative w-full md:w-[600px] h-[400px]'>
                         <Cropper
                             image={selectedImage}
                             crop={crop}
@@ -210,48 +215,71 @@ function ScantoRes() {
                             onCropChange={setCrop}
                             onCropComplete={onCropComplete}
                             onZoomChange={setZoom}
+
                         />
                     </div>
-                    <Button onClick={recognizeText}>Scan text</Button>
+                    <Button
+                        className='mt-4 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
+                        onClick={recognizeText}
+                    >
+                        Scan Text
+                    </Button>
                 </div>
             )}
-            <h2>Recognized Text:</h2>
 
+            <div className='w-full md:w-[600px] space-y-4'>
+                <h2 className='text-xl font-semibold text-purple-700'>Recognized Text:</h2>
 
-            {textLoad ? (<>
-                <Loader2 className='h-6 w-6 animate-spin text-purple-600' />
-            </>) : (<p>{recognizedText}</p>)}
-            <Button onClick={run} className='my-6' disabled={recognizedText.length === 0}>Search</Button>
-            <div className='flex flex-col md:flex-row gap-4'>
-                <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>
-                    <div className='flex gap-2'>
-                        <p className='text-purple-500 font-bold text-xl'>Gemini</p>
-                        <LoaderPinwheel className={`h-6 w-6 ${load1 && 'animate-spin'} text-purple-500`} />
+                {textLoad ? (
+                    <div className='flex justify-center items-center'>
+                        <Loader2 className='h-8 w-8 animate-spin text-purple-600' />
                     </div>
-                    {
-                        load1 ? <Ellipsis className='h-5 w-6 text-purple-500' /> : (
-                            res && <div>
-                                <p>{res}</p>
-                            </div>
-                        )
-                    }
+                ) : (binaryImage.length > 0 && recognizedText.length > 0) && (
+                    <div className='flex flex-col items-center space-y-4'>
+                        <img src={binaryImage} alt="Binarized" className='w-72 h-auto rounded-lg shadow-md border border-purple-300' />
+                        <p className='w-full md:w-96 bg-gray-100 p-4 rounded-lg shadow-md border-2 border-purple-400 text-center text-gray-800'>
+                            {recognizedText}
+                        </p>
+                    </div>
+                )}
+
+                <Button
+                    onClick={run}
+                    className='mt-6 px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700'
+                    disabled={recognizedText.length === 0}
+                >
+                    Search
+                </Button>
+            </div>
+
+            <div className='flex flex-col md:flex-row gap-6'>
+                <div className='w-full md:w-[300px] bg-gray-800 text-white rounded-lg p-4 shadow-md'>
+                    <div className='flex items-center gap-2 mb-2'>
+                        <p className='text-lg font-semibold text-purple-300'>Gemini</p>
+                        <LoaderPinwheel className={`h-6 w-6 ${load1 && 'animate-spin'} text-purple-300`} />
+                    </div>
+                    {load1 ? (
+                        <Ellipsis className='h-6 w-6 text-purple-300' />
+                    ) : (
+                        <p>{res}</p>
+                    )}
                 </div>
-                <div className='w-80 md:w-96 bg-slate-600/50 rounded-md p-2'>
-                    <div className='flex gap-2'>
-                        <p className='text-purple-500 font-bold text-xl'>OpenAI</p>
-                        <LoaderPinwheel className={`h-6 w-6 ${load2 && 'animate-spin'} text-purple-500`} />
+
+                <div className='w-full md:w-[300px] bg-gray-800 text-white rounded-lg p-4 shadow-md'>
+                    <div className='flex items-center gap-2 mb-2'>
+                        <p className='text-lg font-semibold text-purple-300'>OpenAI</p>
+                        <LoaderPinwheel className={`h-6 w-6 ${load2 && 'animate-spin'} text-purple-300`} />
                     </div>
-                    {
-                        load2 ? <Ellipsis className='h-5 w-6 text-purple-500' /> : (
-                            res2 && <div>
-                                <p>{res2}</p>
-                            </div>
-                        )
-                    }
+                    {load2 ? (
+                        <Ellipsis className='h-6 w-6 text-purple-300' />
+                    ) : (
+                        <p>{res2}</p>
+                    )}
                 </div>
             </div>
         </div>
     );
+
 }
 
 export default ScantoRes;

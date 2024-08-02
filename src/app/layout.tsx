@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavigationMenuDemo } from "./component/Header";
+import Footer from "./component/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`bg-black`}>
         <NavigationMenuDemo />
-        {children}</body>
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

@@ -55,12 +55,28 @@ const components: { title: string; href: string; description: string }[] = [
 
 export function NavigationMenuDemo() {
     return (
-        <div className="bg-purple-500/80 text-white rounded-md mb-9">
-            <ul className="flex gap-2 font-semibold  ">
-                <li className="hover:bg-purple-700 p-5"><Link href={'/'}>MCQ</Link></li>
-                <li className="hover:bg-purple-700 p-5"><Link href={'/scan'}>Scan Question</Link></li>
-                <li className="hover:bg-purple-700 p-5"><Link href={'/code'}>Code</Link></li>
+        <div className="bg-purple-600 text-white rounded-lg shadow-lg mb-9">
+            <ul className="flex gap-4 justify-center p-4">
+                <li className="relative group">
+                    <Link href={'/'} className="block py-3 px-6 text-lg font-semibold rounded-md hover:bg-purple-700 transition-colors duration-300">
+                        MCQ
+                    </Link>
+                    <span className="absolute inset-x-0 bottom-0 h-1 bg-purple-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                </li>
+                <li className="relative group">
+                    <Link href={'/scan'} className="block py-3 px-6 text-lg font-semibold rounded-md hover:bg-purple-700 transition-colors duration-300">
+                        Scan Question
+                    </Link>
+                    <span className="absolute inset-x-0 bottom-0 h-1 bg-purple-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                </li>
+                <li className="relative group">
+                    <Link href={'/code'} className="block py-3 px-6 text-lg font-semibold rounded-md hover:bg-purple-700 transition-colors duration-300">
+                        Code
+                    </Link>
+                    <span className="absolute inset-x-0 bottom-0 h-1 bg-purple-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                </li>
             </ul>
         </div>
-    )
+    );
+
 }
