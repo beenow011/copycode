@@ -60,8 +60,8 @@ function Playground() {
                 </div>
                 <div className='mb-6'>
                     <h2 className='text-2xl font-semibold text-purple-300'>Code:</h2>
-                    <div className='flex justify-center  mt-2'>
-                        <div className=''>
+                    <div className='flex flex-col lg:flex-row gap-4 justify-center mt-2'>
+                        <div className='w-full lg:w-1/2'>
                             <AceEditor
                                 placeholder="Placeholder Text"
                                 mode={data.language}
@@ -71,6 +71,7 @@ function Playground() {
                                 fontSize={14}
                                 lineHeight={19}
                                 showPrintMargin={true}
+                                width='100%'
                                 showGutter={true}
                                 highlightActiveLine={true}
                                 value={data.code}
@@ -81,9 +82,10 @@ function Playground() {
                                     showLineNumbers: true,
                                     tabSize: 2,
                                 }}
+                                className="rounded"
                             />
                         </div>
-                        <div className='flex-2'>
+                        <div className='w-full lg:w-1/2'>
                             <div className='h-full w-full p-4 bg-gray-700 rounded'>
                                 <h3 className='text-xl font-semibold text-purple-300 mb-2'>Sample Input:</h3>
                                 <textarea
@@ -91,7 +93,7 @@ function Playground() {
                                     className='w-full bg-black text-white font-mono p-2 rounded'
                                     placeholder="Enter sample input here"
                                 ></textarea>
-                                <Button className='mt-2'>Run</Button>
+                                <button className='mt-2 px-4 py-2 bg-purple-500 rounded hover:bg-purple-600'>Run</button>
                             </div>
                         </div>
                     </div>
@@ -99,6 +101,7 @@ function Playground() {
             </div>
         </div>
     );
+
 
 }
 
