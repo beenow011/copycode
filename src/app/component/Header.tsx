@@ -2,14 +2,23 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 
 export function NavigationMenuDemo() {
+    const route = useRouter()
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     return (
         <div className="bg-purple-600 text-white md:flex justify-between rounded-lg shadow-lg mb-9">
             <div className="p-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">SolveSphere AI</h1>
+                <div className="flex gap-2 items-center hover:scale-105 transition-transform" onClick={() => route.push('/')}>
+                    <div className="bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 rounded-full p-1 hover:bg-gradient-to-l transition">
+                        <Image src={'/solvelogo.png'} alt="logo" height={50} width={50} className="rounded-full" />
+                    </div>
+                    <h1 className="text-2xl font-bold cursor-default">SolveSphere AI</h1>
+                </div>
+
                 <button
                     className="text-white lg:hidden flex items-center"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}

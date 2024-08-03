@@ -4,6 +4,7 @@ import "./globals.css";
 import { NavigationMenuDemo } from "./component/Header";
 import Footer from "./component/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { PlaygroundContext, PlaygroundProvider } from "@/context/playground";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,10 +29,12 @@ export default function RootLayout({
         }
       </head>
       <body className={`bg-gray-800`}>
-        <NavigationMenuDemo />
-        {children}
-        <Footer />
-        <Toaster />
+        <PlaygroundProvider>
+          <NavigationMenuDemo />
+          {children}
+          <Footer />
+          <Toaster />
+        </PlaygroundProvider>
       </body>
     </html>
   );
