@@ -81,7 +81,8 @@ function CodeSearch() {
             outputFormat,
             example,
             codeSnippet,
-            code
+            code,
+            constraints
         })
         route.push('/code/playground')
     }

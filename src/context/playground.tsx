@@ -9,6 +9,7 @@ interface dataParams {
   example: string;
   codeSnippet: string;
   code: string;
+  constraints: string;
 }
 
 interface contextParams {
@@ -23,7 +24,8 @@ const initialData: dataParams = {
   outputFormat: '',
   example: '',
   codeSnippet: '',
-  code: ''
+  code: '',
+  constraints: ""
 };
 
 export const PlaygroundContext = createContext<contextParams>({
