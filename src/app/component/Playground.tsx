@@ -98,14 +98,14 @@ function Playground() {
         // setData(prev => ({ ...prev, code: newValue }));
         setCode(newValue)
     }
-    const { toast } = useToast()
+    // const { toast } = useToast()
     const copyCode = () => {
         navigator.clipboard.writeText(code.substring(3, code.length - 3))
-        toast({
-            title: "Code copied to your keyboard.",
-            description: "You can directly paste the code.",
+        // toast({
+        //     title: "Code copied to your keyboard.",
+        //     description: "You can directly paste the code.",
 
-        })
+        // })
     }
 
     return (
