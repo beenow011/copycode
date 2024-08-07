@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BasicStarReview } from './Feedback';
 
 const Footer = () => {
     return (
@@ -38,6 +39,13 @@ const Footer = () => {
                     <a href="https://www.instagram.com/abhinav_nb/" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-gray-300">
                         Instagram
                     </a>
+                </div>
+                <div className='flex flex-col lg:flex-row gap-6 justify-center items-center'>
+                    <BasicStarReview
+                        rating={4}
+                        text="now, I can clear any interviews OA!"
+                    />
+
                 </div>
             </div>
         </footer>
