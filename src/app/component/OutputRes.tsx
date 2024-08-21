@@ -1,7 +1,7 @@
 import { Ellipsis, LoaderPinwheel } from 'lucide-react'
 import React from 'react'
 
-function OutputRes({ load1, load2, res, res2 }: { load1: boolean, load2: boolean, res: string, res2: string }) {
+function OutputRes({ load1, load2, res, res2, model = 'gpt-4o-mini' }: { load1: boolean, load2: boolean, res: string, res2: string, model: string }) {
     return (
         <div className='flex flex-col md:flex-row gap-6 w-full md:w-2/3'>
             <div className='w-full md:w-1/2 bg-gray-700 rounded-lg p-4 shadow-md'>
@@ -18,7 +18,7 @@ function OutputRes({ load1, load2, res, res2 }: { load1: boolean, load2: boolean
 
             <div className='w-full md:w-1/2 bg-gray-700 rounded-lg p-4 shadow-md'>
                 <div className='flex items-center gap-2 mb-2'>
-                    <p className='text-purple-300 font-semibold text-lg'>OpenAI - <span className='text-purple-500/60'>gpt4o-mini</span> </p>
+                    <p className='text-purple-300 font-semibold text-lg'>OpenAI - <span className='text-purple-500/60'>{model}</span> </p>
                     <LoaderPinwheel className={`h-6 w-6 ${load2 ? 'animate-spin' : ''} text-purple-300`} />
                 </div>
                 {load2 ? (

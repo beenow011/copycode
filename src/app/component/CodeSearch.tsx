@@ -14,6 +14,7 @@ function CodeSearch() {
     const [example, setExample] = useState('');
     const [codeSnippet, setCodeSnippet] = useState('');
     const [constraints, setConstraint] = useState('')
+    const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
     const [load1, setLoad1] = useState(false)
     const route = useRouter()
     const [code, setCode] = useState('');
@@ -43,7 +44,8 @@ function CodeSearch() {
                 outputFormat,
                 example,
                 codeSnippet,
-                constraints
+                constraints,
+                model: selectedModel
             }), // Send the question as JSON in the body
         })
             .then(res => res.json()) // Parse the JSON response
@@ -173,6 +175,21 @@ function CodeSearch() {
                         placeholder="Paste your code snippet here."
                     />
                 </div>
+                <select
+                    value={selectedModel}
+                    onChange={e => setSelectedModel(e.target.value)}
+                    className='mb-6 p-2 rounded-lg bg-gray-300 text-black w-full md:w-96'
+                >
+                    <option value="gpt-4o-mini">GPT-4o-mini</option>
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                    <option value="gpt-4">GPT-4</option>
+
+                </select>
+                <p className="text-yellow-600 text-sm mb-4">
+                    For better and cost-effective implementation, consider using the 4o-mini model.
+                </p>
                 <button
                     type="submit"
                     className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -188,7 +205,7 @@ function CodeSearch() {
                     </div>
                 ) : code && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-md border border-gray-200">
-                        <h3 className="text-xl font-semibold text-purple-600 mb-4">Code Result <span className='text-xs '>GPT4o-mini</span></h3>
+                        <h3 className="text-xl font-semibold text-purple-600 mb-4">Code Result <span className='text-xs '>{selectedModel}</span></h3>
                         <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                             <code>{code.substring(3, code.length - 3)}</code>
                         </pre>

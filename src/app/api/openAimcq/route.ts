@@ -17,13 +17,14 @@ export const POST = async(req: NextRequest , res:NextApiResponse)=>{
 
         const request = await req.json()
         const question = request?.question
+        const model = request?.model
         console.log(question)
        
         if(question.length===0){
             return NextResponse.json({result:"No question"},{status:200})
         }
         const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini', // Correct model name use gpt-4-turbo-2024-04-09 in production
+            model: model, // Correct model name use gpt-4-turbo-2024-04-09 in production
             temperature: 0.1, // Adjust the temperature as needed
             stream: false,
             messages: [
