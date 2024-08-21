@@ -31,7 +31,7 @@ function ScantoRes() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ question: recognizedText }),
+            body: JSON.stringify({ question: recognizedText, model: 'gpt-4o-mini' }),
         })
             .then(res => res.json())
             .then(data => {
@@ -254,7 +254,7 @@ function ScantoRes() {
                     </Button>
                 </div>
 
-                <OutputRes load1={load1} load2={load2} res={res} res2={res2} />
+                <OutputRes load1={load1} load2={load2} res={res} res2={res2} model='gpt-4o-mini' />
             </div>
         </div>
     );
